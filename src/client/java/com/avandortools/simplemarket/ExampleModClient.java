@@ -1,4 +1,4 @@
-package com.avandortools;
+package com.avandortools.simplemarket;
 
 import net.fabricmc.api.ClientModInitializer;
 

@@ -1,4 +1,4 @@
-package com.avandortools.mixin.client;
+package com.avandortools.simplemarket.mixin.client;
 
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
