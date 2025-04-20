@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.avandortools.simplemarket.ExampleMod"
+			"com.avandortools.simplemarket.SimpleMarket"
 		],
 		"client": [
-			"com.avandortools.simplemarket.ExampleModClient"
+			"com.avandortools.simplemarket.SimpleMarketClient"
 		]
 	},
 	"mixins": [

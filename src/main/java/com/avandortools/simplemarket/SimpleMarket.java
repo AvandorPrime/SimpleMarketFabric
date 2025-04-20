@@ -1,18 +1,13 @@
 package com.avandortools.simplemarket;
 
-import com.avandortools.simplemarket.block.TutorialBlocks;
+import com.avandortools.simplemarket.block.ModBlocks;
+import com.avandortools.simplemarket.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExampleMod implements ModInitializer {
+public class SimpleMarket implements ModInitializer {
 	public static final String MOD_ID = "simplemarket";
 
 	// This logger is used to write text to the console and the log file.
@@ -25,7 +20,8 @@ public class ExampleMod implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-		TutorialBlocks.initialize();
+		ModBlocks.initialize();
+		ModItems.initialize();
 		LOGGER.info("Hello Fabric world!");
 	}
 }
