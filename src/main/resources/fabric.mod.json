@@ -19,7 +19,8 @@
 			"com.avandortools.simplemarket.SimpleMarket"
 		],
 		"client": [
-			"com.avandortools.simplemarket.SimpleMarketClient"
+			"com.avandortools.simplemarket.SimpleMarketClient",
+			"com.avandortools.simplemarket.SimpleMarketBlockEntityRenderer"
 		]
 	},
 	"mixins": [

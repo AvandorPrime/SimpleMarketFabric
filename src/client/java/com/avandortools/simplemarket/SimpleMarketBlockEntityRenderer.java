@@ -1,0 +1,13 @@
+package com.avandortools.simplemarket;
+
+import com.avandortools.simplemarket.block.entity.ModBlockEntities;
+import com.avandortools.simplemarket.rendering.blockentity.CounterBlockEntityRenderer;
+import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+
+public class SimpleMarketBlockEntityRenderer implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        BlockEntityRendererFactories.register(ModBlockEntities.COUNTER_BLOCK_ENTITY, CounterBlockEntityRenderer::new);
+    }
+}
