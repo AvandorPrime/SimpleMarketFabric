@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "activated=false": {
+      "model": "simplemarket:block/prismarine_lamp"
+    },
+    "activated=true": {
+      "model": "simplemarket:block/prismarine_lamp_on"
+    }
+  }
+}

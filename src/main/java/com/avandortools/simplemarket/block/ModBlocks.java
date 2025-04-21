@@ -42,6 +42,8 @@ public class ModBlocks {
         ItemGroupEvents.modifyEntriesEvent(CUSTOM_ITEM_GROUP_KEY).register(itemGroup -> {
             itemGroup.add(ModItems.SUSPICIOUS_SUBSTANCE);
             itemGroup.add(ModBlocks.CONDENSED_DIRT.asItem());
+            itemGroup.add(ModBlocks.CONDENSED_OAK_LOG.asItem());
+            itemGroup.add(ModBlocks.PRISMARINE_LAMP.asItem());
 //            itemGroup.add(ModItems.POISONOUS_APPLE);
 //            itemGroup.add(ModItems.GUIDITE_SWORD);
 //            itemGroup.add(ModItems.GUIDITE_HELMET);
@@ -59,22 +61,22 @@ public class ModBlocks {
             .displayName(Text.translatable("itemGroup.simplemarket"))
             .build();
 
-//    public static final Block CONDENSED_DIRT = register(
-//            new Block(AbstractBlock.Settings.create().sounds(BlockSoundGroup.GRASS).requiresTool()),
-//            "condensed_dirt",
-//            true
-//    );
-
     public static final Block CONDENSED_DIRT = register(
             new Block(AbstractBlock.Settings.copy(Blocks.DIRT)),
             "condensed_dirt",
             true
     );
 
-//    public static final Block CONDENSED_OAK_LOG = register(
-//            new PillarBlock(
-//                    AbstractBlock.Settings.create()
-//                            .sounds(BlockSoundGroup.WOOD)
-//            ), "condensed_oak_log", true
-//    );
+    public static final Block CONDENSED_OAK_LOG = register(
+            new PillarBlock(
+                    AbstractBlock.Settings.create()
+                            .sounds(BlockSoundGroup.WOOD)
+            ), "condensed_oak_log", true
+    );
+
+    public static final Block PRISMARINE_LAMP = register(
+            new PrismarineLampBlock(AbstractBlock.Settings.create()),
+            "prismarine_lamp",
+            true
+    );
 }
