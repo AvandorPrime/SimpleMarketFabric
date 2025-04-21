@@ -1,4 +1,5 @@
 {
-  "item.mod_id.suspicious_substance": "Suspicious Substance",
-  "itemGroup.simplemarket": "Simple Market"
+  "item.simplemarket.suspicious_substance": "Suspicious Substance",
+  "itemGroup.simplemarket": "Simple Market",
+  "block.simplemarket.condensed_dirt": "Condensed Dirt"
 }

@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.PillarBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -40,6 +41,7 @@ public class ModBlocks {
 // Register items to the custom item group.
         ItemGroupEvents.modifyEntriesEvent(CUSTOM_ITEM_GROUP_KEY).register(itemGroup -> {
             itemGroup.add(ModItems.SUSPICIOUS_SUBSTANCE);
+            itemGroup.add(ModBlocks.CONDENSED_DIRT.asItem());
 //            itemGroup.add(ModItems.POISONOUS_APPLE);
 //            itemGroup.add(ModItems.GUIDITE_SWORD);
 //            itemGroup.add(ModItems.GUIDITE_HELMET);
@@ -57,16 +59,22 @@ public class ModBlocks {
             .displayName(Text.translatable("itemGroup.simplemarket"))
             .build();
 
+//    public static final Block CONDENSED_DIRT = register(
+//            new Block(AbstractBlock.Settings.create().sounds(BlockSoundGroup.GRASS).requiresTool()),
+//            "condensed_dirt",
+//            true
+//    );
+
     public static final Block CONDENSED_DIRT = register(
-            new Block(AbstractBlock.Settings.create().sounds(BlockSoundGroup.GRASS)),
+            new Block(AbstractBlock.Settings.copy(Blocks.DIRT)),
             "condensed_dirt",
             true
     );
 
-    public static final Block CONDENSED_OAK_LOG = register(
-            new PillarBlock(
-                    AbstractBlock.Settings.create()
-                            .sounds(BlockSoundGroup.WOOD)
-            ), "condensed_oak_log", true
-    );
+//    public static final Block CONDENSED_OAK_LOG = register(
+//            new PillarBlock(
+//                    AbstractBlock.Settings.create()
+//                            .sounds(BlockSoundGroup.WOOD)
+//            ), "condensed_oak_log", true
+//    );
 }
