@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "simplemarket:block/market_crate" }
+  }
+}
