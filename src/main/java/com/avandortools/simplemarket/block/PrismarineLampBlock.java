@@ -25,15 +25,6 @@ public class PrismarineLampBlock extends Block {
         builder.add(ACTIVATED);
     }
 
-//    public static final Block PRISMARINE_LAMP = ModBlocks.register(
-//            new Block(AbstractBlock.Settings.create()
-//                    .sounds(BlockSoundGroup.LANTERN)
-//                    .luminance(PrismarineLampBlock::getLuminance)
-//            ),
-//            "prismarine_lamp",
-//            true
-//    );
-
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.getAbilities().allowModifyWorld) {

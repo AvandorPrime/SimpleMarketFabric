@@ -45,6 +45,7 @@ public class ModBlocks {
             itemGroup.add(ModBlocks.CONDENSED_OAK_LOG.asItem());
             itemGroup.add(ModBlocks.PRISMARINE_LAMP.asItem());
             itemGroup.add(ModBlocks.COUNTER_BLOCK.asItem());
+            itemGroup.add(ModBlocks.MARKET_CRATE.asItem());
             // ...
         });
     }
@@ -76,5 +77,9 @@ public class ModBlocks {
 
     public static final Block COUNTER_BLOCK = register(
             new CounterBlock(AbstractBlock.Settings.create()), "counter_block", true
+    );
+
+    public static final Block MARKET_CRATE = register(
+            new MarketCrateBlock(AbstractBlock.Settings.create()), "market_crate_block", true
     );
 }
