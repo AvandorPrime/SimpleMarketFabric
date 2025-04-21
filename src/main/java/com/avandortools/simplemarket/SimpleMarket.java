@@ -1,6 +1,7 @@
 package com.avandortools.simplemarket;
 
 import com.avandortools.simplemarket.block.ModBlocks;
+import com.avandortools.simplemarket.block.entity.ModBlockEntities;
 import com.avandortools.simplemarket.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 
@@ -22,6 +23,7 @@ public class SimpleMarket implements ModInitializer {
 		// Proceed with mild caution.
 		ModBlocks.initialize();
 		ModItems.initialize();
+		ModBlockEntities.initialize();
 		LOGGER.info("Hello Fabric world!");
 	}
 }

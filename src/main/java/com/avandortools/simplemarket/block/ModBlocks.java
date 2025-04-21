@@ -44,13 +44,7 @@ public class ModBlocks {
             itemGroup.add(ModBlocks.CONDENSED_DIRT.asItem());
             itemGroup.add(ModBlocks.CONDENSED_OAK_LOG.asItem());
             itemGroup.add(ModBlocks.PRISMARINE_LAMP.asItem());
-//            itemGroup.add(ModItems.POISONOUS_APPLE);
-//            itemGroup.add(ModItems.GUIDITE_SWORD);
-//            itemGroup.add(ModItems.GUIDITE_HELMET);
-//            itemGroup.add(ModItems.GUIDITE_BOOTS);
-//            itemGroup.add(ModItems.GUIDITE_LEGGINGS);
-//            itemGroup.add(ModItems.GUIDITE_CHESTPLATE);
-//            itemGroup.add(ModItems.LIGHTNING_STICK);
+            itemGroup.add(ModBlocks.COUNTER_BLOCK.asItem());
             // ...
         });
     }
@@ -78,5 +72,9 @@ public class ModBlocks {
             new PrismarineLampBlock(AbstractBlock.Settings.create()),
             "prismarine_lamp",
             true
+    );
+
+    public static final Block COUNTER_BLOCK = register(
+            new CounterBlock(AbstractBlock.Settings.create()), "counter_block", true
     );
 }
