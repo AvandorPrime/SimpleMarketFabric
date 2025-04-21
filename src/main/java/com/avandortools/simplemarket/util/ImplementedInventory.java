@@ -73,9 +73,7 @@ public interface ImplementedInventory extends Inventory {
     @Override
     default ItemStack removeStack(int slot, int count) {
         ItemStack result = Inventories.splitStack(getItems(), slot, count);
-        if (!result.isEmpty()) {
-            markDirty();
-        }
+        markDirty();
         return result;
     }
 
@@ -85,7 +83,9 @@ public interface ImplementedInventory extends Inventory {
      */
     @Override
     default ItemStack removeStack(int slot) {
-        return Inventories.removeStack(getItems(), slot);
+        ItemStack result = Inventories.removeStack(getItems(), slot);
+        markDirty();
+        return result;
     }
 
     /**
@@ -98,6 +98,7 @@ public interface ImplementedInventory extends Inventory {
     @Override
     default void setStack(int slot, ItemStack stack) {
         getItems().set(slot, stack);
+        markDirty();
         if (stack.getCount() > stack.getMaxCount()) {
             stack.setCount(stack.getMaxCount());
         }
@@ -109,6 +110,7 @@ public interface ImplementedInventory extends Inventory {
     @Override
     default void clear() {
         getItems().clear();
+        markDirty();
     }
 
     /**
@@ -127,5 +129,19 @@ public interface ImplementedInventory extends Inventory {
     @Override
     default boolean canPlayerUse(PlayerEntity player) {
         return true;
+    }
+
+    /**
+     * gets the first stack of items out of the inv
+     * @return a stack of real items if possible, otherwise empty stack
+     */
+    default ItemStack getFirstNonempty() {
+        for (int i = 0; i < size(); i++) {
+            ItemStack stack = getStack(i);
+            if (!stack.isEmpty()) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 }

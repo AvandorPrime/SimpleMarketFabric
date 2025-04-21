@@ -68,14 +68,17 @@ public class MarketCrateScreenHandler extends ScreenHandler {
             newStack = originalStack.copy();
             if (invSlot < this.inventory.size()) {
                 if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                    slot.markDirty();
                     return ItemStack.EMPTY;
                 }
             } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+                slot.markDirty();
                 return ItemStack.EMPTY;
             }
 
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
+                slot.markDirty();
             } else {
                 slot.markDirty();
             }

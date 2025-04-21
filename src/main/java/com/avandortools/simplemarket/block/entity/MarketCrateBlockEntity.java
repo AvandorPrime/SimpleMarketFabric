@@ -2,6 +2,7 @@ package com.avandortools.simplemarket.block.entity;
 
 import com.avandortools.simplemarket.screen.MarketCrateScreenHandler;
 import com.avandortools.simplemarket.util.ImplementedInventory;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,6 +10,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
@@ -54,12 +59,44 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
+
+        // Clear the current inventory to avoid leftover client data
+        for (int i = 0; i < inventory.size(); ++i) {
+            inventory.set(i, ItemStack.EMPTY);
+        }
+
         Inventories.readNbt(nbt, this.inventory, registryLookup);
+//        System.out.println("Reading NBT: " + nbt);
     }
 
     @Override
     public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, this.inventory, registryLookup);
+//        System.out.println("Writing NBT: " + nbt);
     }
+
+    @Override
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+        NbtCompound nbt = new NbtCompound();
+        this.writeNbt(nbt, registryLookup);  // Pass an empty registry lookup if needed
+        return nbt;
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty(); // always call this to keep the world save system happy
+
+        // Notify the client
+        if (this.world != null && !this.world.isClient) {
+            this.world.updateListeners(this.pos, this.getCachedState(), this.getCachedState(), Block.NOTIFY_ALL);
+        }
+        System.out.println("market crate inventory marked as dirty");
+    }
+
+    @Override
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);  // Create a packet to send block entity data to the client
+    }
+
 }
