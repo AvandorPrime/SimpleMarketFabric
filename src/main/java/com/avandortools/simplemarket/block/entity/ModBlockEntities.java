@@ -16,6 +16,9 @@ public class ModBlockEntities {
     public static final BlockEntityType<CounterBlockEntity> COUNTER_BLOCK_ENTITY =
             register("counter", CounterBlockEntity::new, ModBlocks.COUNTER_BLOCK);
 
+    public static final BlockEntityType<MarketCrateBlockEntity> MARKET_CRATE_BLOCK_ENTITY =
+            register("market_crate", MarketCrateBlockEntity::new, ModBlocks.MARKET_CRATE);
+
     private static <T extends BlockEntity> BlockEntityType<T> register(String name,
                                                                        BlockEntityType.BlockEntityFactory<? extends T> entityFactory,
                                                                        Block... blocks) {
