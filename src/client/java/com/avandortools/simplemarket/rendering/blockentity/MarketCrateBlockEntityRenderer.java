@@ -41,9 +41,9 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
             matrices.push();
 
 
-            matrices.translate(pos[0], 2.0/16.0, pos[1]); //TODO: change 1 back to 1/16 when fin debugging
-            matrices.scale(0.5f, 0.1f, 0.5f);
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+            matrices.translate(pos[0], 2.0/16.0, pos[1]);
+            matrices.scale(0.8f, 0.8f, 0.8f);
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(45));
 
             itemRenderer.renderItem(itemStack, ModelTransformationMode.GROUND, light, overlay, matrices, vertexConsumers, null, 0);
 
@@ -65,7 +65,9 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
                 {offsetInnerX, offsetInnerZ},
                 {offsetInnerX, offsetOuterZ},
                 {offsetOuterX, offsetInnerZ},
-                {offsetOuterX, offsetOuterZ}
+                {offsetOuterX, offsetOuterZ},
+                {offsetInnerX, (offsetInnerZ+offsetOuterZ)/2},
+                {offsetOuterX, (offsetInnerZ+offsetOuterZ)/2}
         };
     }
 

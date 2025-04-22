@@ -14,6 +14,7 @@ multiple crates with same food item = locked processing, singleton
 improve model + texture. dyeable base mat for crate
 more display types. angled crates, hooks, frames, stands
 recipes
+odometer style "total sales" tracker
 
 coin interchange 
 importer + importer cards
