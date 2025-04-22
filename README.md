@@ -3,6 +3,7 @@ Simple market is a mod which provides a simulated retail of various produced goo
 Initially this will only work with food items, but can potentially be expanded.
 
 ## prebeta TODO
+normal crate can sit on top of slab?
 slight luminance while processing
 number of items rendered on block proportional to remaining stack size
 nitwit/friendly mob spawn on completion, slight chance

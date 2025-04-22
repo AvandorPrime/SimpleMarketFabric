@@ -71,7 +71,14 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
         };
     }
 
+    private long lastParticleTick = 0;
     public void spawnGoldParticles(World world, BlockPos pos) {
+        long gameTime = world.getTime();
+
+        // Only spawn every 10 ticks or so
+        if (gameTime - lastParticleTick < 10) return;
+        lastParticleTick = gameTime;
+
         if (world.isClient()) {
             // Adjust these values for how you want the particles to spawn
             for (int i = 0; i < 1; i++) {
