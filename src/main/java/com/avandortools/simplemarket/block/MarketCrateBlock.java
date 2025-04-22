@@ -3,16 +3,15 @@ package com.avandortools.simplemarket.block;
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
 import com.avandortools.simplemarket.block.entity.ModBlockEntities;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -24,8 +23,11 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class MarketCrateBlock extends BlockWithEntity {
+    public static final BooleanProperty PROCESSING = BooleanProperty.of("processing");
+
     protected MarketCrateBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.stateManager.getDefaultState().with(PROCESSING, false));
     }
 
     // This method is required since 1.20.5.
@@ -104,5 +106,14 @@ public class MarketCrateBlock extends BlockWithEntity {
             };
         }
         return null;
+    }
+
+    public static int getLuminance(BlockState state) {
+        return state.get(PROCESSING) ? 6 : 0;
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(PROCESSING);
     }
 }

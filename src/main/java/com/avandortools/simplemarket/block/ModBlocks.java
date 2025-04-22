@@ -80,6 +80,6 @@ public class ModBlocks {
     );
 
     public static final Block MARKET_CRATE = register(
-            new MarketCrateBlock(AbstractBlock.Settings.create()), "market_crate", true
+            new MarketCrateBlock(AbstractBlock.Settings.create().luminance(MarketCrateBlock::getLuminance)), "market_crate", true
     );
 }

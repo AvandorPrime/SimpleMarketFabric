@@ -1,5 +1,6 @@
 package com.avandortools.simplemarket.block.entity;
 
+import com.avandortools.simplemarket.block.MarketCrateBlock;
 import com.avandortools.simplemarket.screen.MarketCrateScreenHandler;
 import com.avandortools.simplemarket.util.ImplementedInventory;
 import net.minecraft.block.Block;
@@ -10,11 +11,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -22,7 +21,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
@@ -124,7 +122,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
             ItemStack output = inventory.get(1);
 
             if (!input.isEmpty() && output.isEmpty()) {
-                if (!isProcessing) flipIsProcessing();
+                setIsProcessing(true);
                 progress++;
                 if (progress >= MAX_PROGRESS) {
                     // Move item from slot 0 to 1
@@ -138,7 +136,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
             } else {
                 // Reset if conditions aren't met
                 progress = 0;
-                if (isProcessing) flipIsProcessing();
+                setIsProcessing(false);
             }
         }
     }
@@ -166,9 +164,17 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         return isProcessing;
     }
 
-    public void flipIsProcessing() {
-        isProcessing = !isProcessing;
-        markDirty();
+    public void setIsProcessing(boolean newValue) {
+        if (isProcessing != newValue) {
+            markDirty();
+            isProcessing = newValue;
+        }
+
+        if (world != null) {
+            BlockState state = world.getBlockState(pos);
+            BlockState newState = state.with(MarketCrateBlock.PROCESSING, isProcessing);
+            world.setBlockState(pos, newState, Block.NOTIFY_LISTENERS); // Notify listeners to update state
+        }
     }
 
 }
