@@ -168,12 +168,12 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         if (isProcessing != newValue) {
             markDirty();
             isProcessing = newValue;
-        }
 
-        if (world != null) {
-            BlockState state = world.getBlockState(pos);
-            BlockState newState = state.with(MarketCrateBlock.PROCESSING, isProcessing);
-            world.setBlockState(pos, newState, Block.NOTIFY_LISTENERS); // Notify listeners to update state
+            if (world != null) {
+                BlockState state = world.getBlockState(pos);
+                BlockState newState = state.with(MarketCrateBlock.PROCESSING, isProcessing);
+                world.setBlockState(pos, newState, Block.NOTIFY_LISTENERS); // Notify listeners to update state
+            }
         }
     }
 
