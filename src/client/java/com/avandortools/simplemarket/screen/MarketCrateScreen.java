@@ -10,15 +10,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class MarketCrateScreen extends HandledScreen<MarketCrateScreenHandler> {
+
     // A path to the gui texture. In this example we use the texture from the dispenser
-
     //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/container/dispenser.png");
-    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/container/bundle/blocked_slot.png");
-    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/container/slot.png");
-    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/container/bundle/background.png");
-
+    //private static final Identifier PROGRESS_ARROW_TEXTURE = Identifier.ofVanilla("container/furnace/burn_progress");
+    private static final Identifier PROGRESS_ARROW_TEXTURE = Identifier.of(SimpleMarket.MOD_ID, "burn_progress");
     private static final Identifier TEXTURE = Identifier.of(SimpleMarket.MOD_ID, "textures/gui/market_crate.png");
-
 
     public MarketCrateScreen(MarketCrateScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -26,12 +23,20 @@ public class MarketCrateScreen extends HandledScreen<MarketCrateScreenHandler> {
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+//        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+//        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+////        RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
         context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
+
+        // Draw the arrow progress bar (like furnace)
+        int progress = handler.getProgress();
+        int maxProgress = handler.getMaxProgress();
+        int arrowWidth = 24;
+        int progressWidth = (progress * arrowWidth) / maxProgress;
+
+        context.drawGuiTexture(PROGRESS_ARROW_TEXTURE, 24, 16, 0, 0, x + 79, y + 34, progressWidth, 16);
     }
 
     @Override

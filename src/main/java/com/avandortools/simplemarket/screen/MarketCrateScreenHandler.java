@@ -8,22 +8,25 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
 public class MarketCrateScreenHandler extends ScreenHandler {
     private final Inventory inventory;
+    private final PropertyDelegate propertyDelegate;
 
     // This constructor gets called on the client when the server wants it to open the screenHandler,
     // The client will call the other constructor with an empty Inventory and the screenHandler will automatically
     // sync this empty inventory with the inventory on the server.
     public MarketCrateScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(9));
+        this(syncId, playerInventory, new SimpleInventory(9), new ArrayPropertyDelegate(2));
     }
 
     // This constructor gets called from the BlockEntity on the server without calling the other constructor first, the server knows the inventory of the container
     // and can therefore directly provide it as an argument. This inventory will then be synced to the client.
-    public MarketCrateScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+    public MarketCrateScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(ModScreenHandlers.MARKET_CRATE_SCREEN_HANDLER, syncId);
         checkSize(inventory, 2);
         this.inventory = inventory;
@@ -53,6 +56,9 @@ public class MarketCrateScreenHandler extends ScreenHandler {
         for (m = 0; m < 9; ++m) {
             this.addSlot(new Slot(playerInventory, m, 8 + m * 18, 142));
         }
+
+        this.propertyDelegate = propertyDelegate; // progress, maxProgress
+        this.addProperties(propertyDelegate);
 
     }
 
@@ -88,5 +94,13 @@ public class MarketCrateScreenHandler extends ScreenHandler {
         }
 
         return newStack;
+    }
+
+    public int getProgress() {
+        return propertyDelegate.get(0);
+    }
+
+    public int getMaxProgress() {
+        return propertyDelegate.get(1);
     }
 }

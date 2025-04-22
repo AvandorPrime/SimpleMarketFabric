@@ -16,6 +16,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -44,7 +45,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         // We provide *this* to the screenHandler as our class Implements Inventory
         // Only the Server has the Inventory at the start, this will be synced to the client in the ScreenHandler
-        return new MarketCrateScreenHandler(syncId, playerInventory, this);
+        return new MarketCrateScreenHandler(syncId, playerInventory, this, this.getPropertyDelegate());
     }
 
     @Override
@@ -110,17 +111,48 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         }
     }
 
-    private int processingCooldown = 0;
+    private int progress = 0;
+    private static final int MAX_PROGRESS = 100; // How many ticks to fully process
     public void tick() {
-        System.out.println("market crate tick");
-        if (world != null && !world.isClient) {
-            if (processingCooldown > 0) {
-                processingCooldown--;
+        if (!this.world.isClient) {
+            ItemStack input = inventory.get(0);
+            ItemStack output = inventory.get(1);
+
+            if (!input.isEmpty() && output.isEmpty()) {
+                progress++;
+                if (progress >= MAX_PROGRESS) {
+                    // Move item from slot 0 to 1
+                    inventory.set(1, input.split(1));
+                    if (input.isEmpty()) {
+                        inventory.set(0, ItemStack.EMPTY);
+                    }
+                    progress = 0;
+                    markDirty();
+                }
             } else {
-                processItems(); // Process items every x ticks
-                processingCooldown = 20; // Cooldown for next process (adjust as needed)
+                // Reset if conditions aren't met
+                progress = 0;
             }
         }
+    }
+
+    public PropertyDelegate getPropertyDelegate() {
+        return new PropertyDelegate() {
+            @Override
+            public int get(int index) {
+                return index == 0 ? progress : MAX_PROGRESS;
+            }
+
+            @Override
+            public void set(int index, int value) {
+                if (index == 0) progress = value;
+            }
+
+            @Override
+            public int size() {
+                return 2;
+            }
+        };
     }
 
 }
