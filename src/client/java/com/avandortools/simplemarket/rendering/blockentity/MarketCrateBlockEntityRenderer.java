@@ -1,9 +1,6 @@
 package com.avandortools.simplemarket.rendering.blockentity;
 
-import com.avandortools.simplemarket.block.entity.CounterBlockEntity;
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
@@ -12,7 +9,7 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RotationAxis;
-import org.joml.Matrix4f;
+import org.jetbrains.annotations.NotNull;
 
 public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<MarketCrateBlockEntity> {
     private final ItemRenderer itemRenderer;
@@ -31,19 +28,7 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
     }
 
     private void renderItemOnBlock(ItemStack itemStack, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        double offsetMargin = 2/16.0 + (12.0/16.0)/4;
-        double itemSize = 10.0/16.0; //half because we scale 0.5?
-        double offsetInnerX = offsetMargin;
-        double offsetInnerZ = offsetMargin - itemSize/8;
-        double offsetOuterX = 1 - offsetMargin;
-        double offsetOuterZ = offsetOuterX - itemSize/8;
-
-        double[][] positions = {
-                {offsetInnerX, offsetInnerZ},
-                {offsetInnerX, offsetOuterZ},
-                {offsetOuterX, offsetInnerZ},
-                {offsetOuterX, offsetOuterZ}
-        };
+        double[][] positions = getPositions();
         for (double[] pos : positions) {
             matrices.push();
 
@@ -56,5 +41,23 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
 
             matrices.pop();
         }
+    }
+
+    private static double[] @NotNull [] getPositions() {
+        double padding = 2/16.0;
+        double quarteredRemainingSpace = (12.0/16.0)/4;
+        double itemSize = 10.0/16.0;
+
+        double offsetInnerX =  padding + quarteredRemainingSpace;
+        double offsetInnerZ = offsetInnerX - itemSize/8;
+        double offsetOuterX = 1 - offsetInnerX;
+        double offsetOuterZ = offsetOuterX - itemSize/8;
+
+        return new double[][]{
+                {offsetInnerX, offsetInnerZ},
+                {offsetInnerX, offsetOuterZ},
+                {offsetOuterX, offsetInnerZ},
+                {offsetOuterX, offsetOuterZ}
+        };
     }
 }
