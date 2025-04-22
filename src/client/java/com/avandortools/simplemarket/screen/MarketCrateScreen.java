@@ -1,5 +1,6 @@
 package com.avandortools.simplemarket.screen;
 
+import com.avandortools.simplemarket.SimpleMarket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -11,9 +12,13 @@ import net.minecraft.util.Identifier;
 public class MarketCrateScreen extends HandledScreen<MarketCrateScreenHandler> {
     // A path to the gui texture. In this example we use the texture from the dispenser
 
-    private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/container/dispenser.png");
-    // For versions before 1.21:
-    // private static final Identifier TEXTURE = new Identifier("minecraft", "textures/gui/container/dispenser.png");
+    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/container/dispenser.png");
+    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/container/bundle/blocked_slot.png");
+    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/container/slot.png");
+    //private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/container/bundle/background.png");
+
+    private static final Identifier TEXTURE = Identifier.of(SimpleMarket.MOD_ID, "textures/gui/market_crate.png");
+
 
     public MarketCrateScreen(MarketCrateScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);

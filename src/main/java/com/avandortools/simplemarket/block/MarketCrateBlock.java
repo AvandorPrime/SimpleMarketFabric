@@ -1,12 +1,15 @@
 package com.avandortools.simplemarket.block;
 
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
+import com.avandortools.simplemarket.block.entity.ModBlockEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
@@ -18,6 +21,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 public class MarketCrateBlock extends BlockWithEntity {
     protected MarketCrateBlock(Settings settings) {
@@ -84,5 +88,21 @@ public class MarketCrateBlock extends BlockWithEntity {
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView blockView, BlockPos pos, ShapeContext context) {
         return VoxelShapes.cuboid(0, 0, 0, 1, 7.0/16.0, 1); // Modify the coordinates based on your model's size
+    }
+
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return validateTicker(world, type, ModBlockEntities.MARKET_CRATE_BLOCK_ENTITY);
+    }
+
+    protected static <T extends BlockEntity> BlockEntityTicker<T> validateTicker(
+            World world, BlockEntityType<T> type, BlockEntityType<?> correctType) {
+        if (type == correctType) {
+            // Return the BlockEntityTicker for MarketCrateBlockEntity's tick method
+            return (world1, pos, state, entity) -> {
+                ((MarketCrateBlockEntity) entity).tick();
+            };
+        }
+        return null;
     }
 }

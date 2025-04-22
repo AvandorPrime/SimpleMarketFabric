@@ -25,7 +25,7 @@ public class MarketCrateScreenHandler extends ScreenHandler {
     // and can therefore directly provide it as an argument. This inventory will then be synced to the client.
     public MarketCrateScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
         super(ModScreenHandlers.MARKET_CRATE_SCREEN_HANDLER, syncId);
-        checkSize(inventory, 9);
+        checkSize(inventory, 2);
         this.inventory = inventory;
         // some inventories do custom logic when a player opens it.
         inventory.onOpen(playerInventory.player);
@@ -35,11 +35,14 @@ public class MarketCrateScreenHandler extends ScreenHandler {
         int m;
         int l;
         // Our inventory
-        for (m = 0; m < 3; ++m) {
-            for (l = 0; l < 3; ++l) {
-                this.addSlot(new Slot(inventory, l + m * 3, 62 + l * 18, 17 + m * 18));
+        this.addSlot(new Slot(inventory, 0, 56, 34));
+        this.addSlot(new Slot(inventory, 1, 112, 34) {
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false; // disables inserting items
             }
-        }
+        });
+
         // The player inventory
         for (m = 0; m < 3; ++m) {
             for (l = 0; l < 9; ++l) {

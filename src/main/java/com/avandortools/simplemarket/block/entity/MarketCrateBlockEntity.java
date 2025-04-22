@@ -22,7 +22,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
 public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
-    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
 
     public MarketCrateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MARKET_CRATE_BLOCK_ENTITY, pos, state);
@@ -97,6 +97,30 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);  // Create a packet to send block entity data to the client
+    }
+
+    //this is where we sell items for coins $$$$ #capitalism #money #cringemod
+    public void processItems() {
+        ItemStack inputItem = inventory.get(0); // Slot 0 (input)
+        if (!inputItem.isEmpty()) {
+            // Move item from Slot 0 to Slot 1 (output)
+            inventory.set(1, inputItem.copy());
+            inventory.set(0, ItemStack.EMPTY); // Empty Slot 0
+            markDirty(); // Mark for saving
+        }
+    }
+
+    private int processingCooldown = 0;
+    public void tick() {
+        System.out.println("market crate tick");
+        if (world != null && !world.isClient) {
+            if (processingCooldown > 0) {
+                processingCooldown--;
+            } else {
+                processItems(); // Process items every x ticks
+                processingCooldown = 20; // Cooldown for next process (adjust as needed)
+            }
+        }
     }
 
 }
