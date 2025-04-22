@@ -25,8 +25,8 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
 
     @Override
     public void render(MarketCrateBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if (!entity.isEmpty()) {
-            ItemStack itemStack = entity.getFirstNonempty();
+        ItemStack itemStack = entity.getStack(0);
+        if (!itemStack.isEmpty()) {
             renderItemOnBlock(itemStack, matrices, vertexConsumers, light, overlay);
         }
 //        System.out.println("crate ItemStack: " + entity.getItems());
@@ -37,9 +37,10 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
 
     private void renderItemOnBlock(ItemStack itemStack, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         double[][] positions = getPositions();
-        for (double[] pos : positions) {
+        itemStack.getCount();
+        for (int i = 0; i < Math.min(positions.length, itemStack.getCount()); i++) {
+            double[] pos = positions[i];
             matrices.push();
-
 
             matrices.translate(pos[0], 2.0/16.0, pos[1]);
             matrices.scale(0.8f, 0.8f, 0.8f);
@@ -63,11 +64,11 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
 
         return new double[][]{
                 {offsetInnerX, offsetInnerZ},
+                {offsetInnerX, (offsetInnerZ+offsetOuterZ)/2},
                 {offsetInnerX, offsetOuterZ},
                 {offsetOuterX, offsetInnerZ},
-                {offsetOuterX, offsetOuterZ},
-                {offsetInnerX, (offsetInnerZ+offsetOuterZ)/2},
-                {offsetOuterX, (offsetInnerZ+offsetOuterZ)/2}
+                {offsetOuterX, (offsetInnerZ+offsetOuterZ)/2},
+                {offsetOuterX, offsetOuterZ}
         };
     }
 
