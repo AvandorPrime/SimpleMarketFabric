@@ -14,6 +14,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -21,6 +22,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
@@ -67,6 +69,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         }
 
         Inventories.readNbt(nbt, this.inventory, registryLookup);
+        isProcessing = nbt.getBoolean("IsProcessing");
 //        System.out.println("Reading NBT: " + nbt);
     }
 
@@ -74,6 +77,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, this.inventory, registryLookup);
+        nbt.putBoolean("IsProcessing", isProcessing);
 //        System.out.println("Writing NBT: " + nbt);
     }
 
@@ -112,13 +116,15 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     }
 
     private int progress = 0;
-    private static final int MAX_PROGRESS = 100; // How many ticks to fully process
+    private static final int MAX_PROGRESS = 5000; // How many ticks to fully process
+    private boolean isProcessing = false;
     public void tick() {
         if (!this.world.isClient) {
             ItemStack input = inventory.get(0);
             ItemStack output = inventory.get(1);
 
             if (!input.isEmpty() && output.isEmpty()) {
+                if (!isProcessing) flipIsProcessing();
                 progress++;
                 if (progress >= MAX_PROGRESS) {
                     // Move item from slot 0 to 1
@@ -132,6 +138,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
             } else {
                 // Reset if conditions aren't met
                 progress = 0;
+                if (isProcessing) flipIsProcessing();
             }
         }
     }
@@ -153,6 +160,15 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
                 return 2;
             }
         };
+    }
+
+    public boolean getIsProcessing(){
+        return isProcessing;
+    }
+
+    public void flipIsProcessing() {
+        isProcessing = !isProcessing;
+        markDirty();
     }
 
 }

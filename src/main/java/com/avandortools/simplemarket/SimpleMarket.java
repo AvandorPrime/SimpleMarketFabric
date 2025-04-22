@@ -6,6 +6,8 @@ import com.avandortools.simplemarket.item.ModItems;
 import com.avandortools.simplemarket.screen.ModScreenHandlers;
 import net.fabricmc.api.ModInitializer;
 
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
