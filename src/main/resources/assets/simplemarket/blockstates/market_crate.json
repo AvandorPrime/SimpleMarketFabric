@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": { "model": "simplemarket:block/market_crate" }
+    "facing=north": { "model": "simplemarket:block/market_crate", "uvlock": true },
+    "facing=east":  { "model": "simplemarket:block/market_crate", "y":  90, "uvlock": true },
+    "facing=south": { "model": "simplemarket:block/market_crate", "y": 180, "uvlock": true },
+    "facing=west":  { "model": "simplemarket:block/market_crate", "y": 270, "uvlock": true }
   }
 }

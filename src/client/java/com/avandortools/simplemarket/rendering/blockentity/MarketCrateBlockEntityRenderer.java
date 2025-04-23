@@ -1,6 +1,8 @@
 package com.avandortools.simplemarket.rendering.blockentity;
 
+import com.avandortools.simplemarket.block.MarketCrateBlock;
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
@@ -9,8 +11,8 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +29,9 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
     public void render(MarketCrateBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         ItemStack itemStack = entity.getStack(0);
         if (!itemStack.isEmpty()) {
-            renderItemOnBlock(itemStack, matrices, vertexConsumers, light, overlay);
+            BlockState state = entity.getCachedState();
+            Direction facing = state.get(MarketCrateBlock.HORIZONTAL_FACING);
+            renderItemOnBlock(itemStack, matrices, vertexConsumers, light, overlay, facing);
         }
 //        System.out.println("crate ItemStack: " + entity.getItems());
         if (entity.getIsProcessing() && Math.random() < 0.05) {
@@ -35,8 +39,24 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
         }
     }
 
-    private void renderItemOnBlock(ItemStack itemStack, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    private void renderItemOnBlock(ItemStack itemStack, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Direction facing) {
         double[][] positions = getPositions();
+
+        // Start by centering the matrix stack to the middle of the block
+        matrices.push();
+        matrices.translate(0.5, 0, 0.5);
+        // Rotate around Y axis based on block facing
+        float rotation = switch (facing) {
+            case NORTH -> 0f;
+            case SOUTH -> 180f;
+            case WEST -> 90f;
+            case EAST -> -90f;
+            default -> 0f;
+        };
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotation));
+        // Move back to origin so translations apply relative to block corner
+        matrices.translate(-0.5, 0, -0.5);
+
         itemStack.getCount();
         for (int i = 0; i < Math.min(positions.length, itemStack.getCount()); i++) {
             double[] pos = positions[i];
@@ -50,6 +70,7 @@ public class MarketCrateBlockEntityRenderer implements BlockEntityRenderer<Marke
 
             matrices.pop();
         }
+        matrices.pop();
     }
 
     private static double[] @NotNull [] getPositions() {
