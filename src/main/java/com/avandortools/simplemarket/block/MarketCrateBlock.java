@@ -138,4 +138,15 @@ public class MarketCrateBlock extends BlockWithEntity  {
     protected BlockState mirror(BlockState state, BlockMirror mirror) {
         return state.rotate(mirror.getRotation(state.get(HORIZONTAL_FACING)));
     }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof MarketCrateBlockEntity) {
+            ((MarketCrateBlockEntity) blockEntity).onBlockDestroyed();
+        }
+        return state;
+    }
 }

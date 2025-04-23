@@ -6,6 +6,7 @@ Initially this will only work with food items, but can potentially be expanded.
 
 ## prebeta TODO
 - nitwit/friendly mob spawn on completion, slight chance
+- despawn villagers slowly at night
 - zero out progress when item input is swapped
 - villagers will eat food
 - Restrict market crate to only take food items
@@ -22,4 +23,5 @@ Initially this will only work with food items, but can potentially be expanded.
 * importer + importer cards
 
 ## Future
-shipment crates. long processing time, coin bonus, require create.
+- shipment crates. long processing time, coin bonus, require create.
+- consider data attachment (new api) or mixin to track all villagers spawned by mod

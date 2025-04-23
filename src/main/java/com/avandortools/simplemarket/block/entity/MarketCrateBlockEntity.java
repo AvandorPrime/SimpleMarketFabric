@@ -1,22 +1,19 @@
 package com.avandortools.simplemarket.block.entity;
 
 import com.avandortools.simplemarket.block.MarketCrateBlock;
-import com.avandortools.simplemarket.mixin.MobEntityGoalAccessor;
+import com.avandortools.simplemarket.entity.AmbientMobSpawner;
 import com.avandortools.simplemarket.screen.MarketCrateScreenHandler;
+import com.avandortools.simplemarket.util.AvandorTimeUtils.TimeConstants;
 import com.avandortools.simplemarket.util.ImplementedInventory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -28,25 +25,24 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.UUID;
 
 public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
+//    private final List<UUID> villagerUUIDs = new ArrayList<>();
+    private final ArrayList<MobEntity> villagers = new ArrayList<>();
+    private int ambientSpawnTimer = 200;
+    //private int ambientSpawnStartValue = TimeConstants.TICKS_PER_IRL_MINUTE*5 + world.random.nextInt(TimeConstants.TICKS_PER_IRL_MINUTE*10);
+    private final int ambientSpawnStartValue = 200;
 
     public MarketCrateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MARKET_CRATE_BLOCK_ENTITY, pos, state);
     }
 
-
     // From the ImplementedInventory Interface
-
     @Override
     public DefaultedList<ItemStack> getItems() {
         return inventory;
@@ -65,10 +61,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
 
     @Override
     public Text getDisplayName() {
-        // for 1.19+
         return Text.translatable(getCachedState().getBlock().getTranslationKey());
-        // for earlier versions
-        // return new TranslatableText(getCachedState().getBlock().getTranslationKey());
     }
 
     // For the following two methods, for earlier versions, remove the parameter `registryLookup`.
@@ -83,7 +76,18 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
 
         Inventories.readNbt(nbt, this.inventory, registryLookup);
         isProcessing = nbt.getBoolean("IsProcessing");
-//        System.out.println("Reading NBT: " + nbt);
+
+        ambientSpawnTimer = nbt.getInt("AmbientSpawnTimer");
+        this.villagers.clear();
+        NbtList list = nbt.getList("villagerUUIDs", NbtElement.STRING_TYPE);
+
+        for (NbtElement element : list) {
+            if (element instanceof NbtString) {
+                String uuidString = ((NbtString) element).asString();
+                this.villagers.add((MobEntity) ((ServerWorld) world).getEntity(UUID.fromString(uuidString)));
+            }
+        }
+        nbt.put("villagerUUIDs", list);
     }
 
     @Override
@@ -91,7 +95,13 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         super.writeNbt(nbt, registryLookup);
         Inventories.writeNbt(nbt, this.inventory, registryLookup);
         nbt.putBoolean("IsProcessing", isProcessing);
-//        System.out.println("Writing NBT: " + nbt);
+
+        nbt.putInt("AmbientSpawnTimer", ambientSpawnTimer);
+        NbtList list = new NbtList();
+        for (MobEntity villager : villagers) {
+            list.add(NbtHelper.fromUuid(villager.getUuid()));
+        }
+        nbt.put("villagerUUIDs", list);
     }
 
     @Override
@@ -128,7 +138,6 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         }
     }
 
-    private int ambientSpawnTimer = 600; // 30 seconds
     private int progress = 0;
 //    private static final int MAX_PROGRESS = 5000; // How many ticks to fully process
     private static final int MAX_PROGRESS = 100; // How many ticks to fully process
@@ -155,15 +164,9 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
                 progress = 0;
                 setIsProcessing(false);
             }
-
-            if (--ambientSpawnTimer <= 0) {
-                ambientSpawnTimer = 600;
-
-                int crateCount = countNearbyMarketCrates(world, pos, 16);
-                trySpawnAmbientMob(world, pos, EntityType.CAT, 16, 1, 1);
-                trySpawnAmbientMob(world, pos, EntityType.VILLAGER, 16, (int) Math.ceil(0.5*crateCount), 1);
-                trySpawnAmbientMob(world, pos, EntityType.WOLF, 16, 1, 1);
-            }
+            AmbientMobSpawner.tick(this.world, this.pos, villagers, --ambientSpawnTimer);
+            System.out.println("ambientSpawnTimer: " + ambientSpawnTimer);
+            if (ambientSpawnTimer <= 0) ambientSpawnTimer = 200;
         }
     }
 
@@ -203,72 +206,8 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         }
     }
 
-    public static void trySpawnAmbientMob(World world, BlockPos pos, EntityType<? extends MobEntity> type, int radius, int maxNearby, int chanceOutOf) {
-        if (world.isClient || !(world instanceof ServerWorld serverWorld)) return;
-
-        if (world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), 32, false) == null) return;
-
-        Predicate<MobEntity> filter = mob -> mob.getType() == type && !mob.isPersistent();
-
-        List<MobEntity> nearby = serverWorld.getEntitiesByClass(
-                MobEntity.class,
-                new Box(pos).expand(radius),
-                filter
-        );
-
-        if (nearby.size() >= maxNearby || world.getRandom().nextInt(chanceOutOf) != 0) return;
-
-        MobEntity mob = type.create(world);
-        if (mob == null) return;
-
-        mob.refreshPositionAndAngles(
-                pos.getX() + 0.5 + (world.getRandom().nextDouble() - 0.5) * 4,
-                pos.getY() + 1,
-                pos.getZ() + 0.5 + (world.getRandom().nextDouble() - 0.5) * 4,
-                world.getRandom().nextFloat() * 360,
-                0
-        );
-
-        GoalSelector selector = ((MobEntityGoalAccessor) mob).getGoalSelector();
-        selector.add(0, new StayNearBlockGoal(mob, pos, 12.0, 1.0));
-
-        world.spawnEntity(mob);
+    public void onBlockDestroyed() {
+        AmbientMobSpawner.destroyAllVillagers(villagers);
+        villagers.clear();
     }
-
-    public static class StayNearBlockGoal extends Goal {
-        private final MobEntity mob;
-        private final BlockPos anchor;
-        private final double maxDistance;
-        private final double speed;
-
-        public StayNearBlockGoal(MobEntity mob, BlockPos anchor, double maxDistance, double speed) {
-            this.mob = mob;
-            this.anchor = anchor;
-            this.maxDistance = maxDistance;
-            this.speed = speed;
-        }
-
-        @Override
-        public boolean canStart() {
-            return mob.squaredDistanceTo(Vec3d.ofCenter(anchor)) > maxDistance * maxDistance;
-        }
-
-        @Override
-        public void start() {
-            mob.getNavigation().startMovingTo(anchor.getX() + 0.5, anchor.getY(), anchor.getZ() + 0.5, speed);
-        }
-
-        @Override
-        public boolean shouldContinue() {
-            return canStart();
-        }
-
-    }
-    public static int countNearbyMarketCrates(World world, BlockPos pos, int radius) {
-        Box area = new Box(pos).expand(radius);
-        return (int) BlockPos.stream(area)
-                .filter(p -> world.getBlockEntity(p) instanceof MarketCrateBlockEntity)
-                .count();
-    }
-
 }
