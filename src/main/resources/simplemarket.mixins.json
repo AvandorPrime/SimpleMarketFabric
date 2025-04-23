@@ -3,7 +3,8 @@
 	"package": "com.avandortools.simplemarket.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"MobEntityGoalAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

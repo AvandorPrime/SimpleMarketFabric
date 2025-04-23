@@ -5,9 +5,8 @@ Initially this will only work with food items, but can potentially be expanded.
 ![Screenshot 2025-04-23 001203.png](Screenshot%202025-04-23%20001203.png)
 
 ## prebeta TODO
-- number of items rendered on block proportional to remaining stack size
-- rotate the block and the items based on placement (right now they always face +x)
 - nitwit/friendly mob spawn on completion, slight chance
+- zero out progress when item input is swapped
 - villagers will eat food
 - Restrict market crate to only take food items
 - change market crate to process food into coins
