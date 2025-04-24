@@ -2,12 +2,13 @@ package com.avandortools.simplemarket;
 
 import com.avandortools.simplemarket.block.ModBlocks;
 import com.avandortools.simplemarket.block.entity.ModBlockEntities;
+import com.avandortools.simplemarket.entity.MarketVillagerEntity;
+import com.avandortools.simplemarket.entity.ModEntityTypes;
 import com.avandortools.simplemarket.item.ModItems;
 import com.avandortools.simplemarket.screen.ModScreenHandlers;
 import net.fabricmc.api.ModInitializer;
 
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.util.math.BlockPos;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,10 @@ public class SimpleMarket implements ModInitializer {
 		ModItems.initialize();
 		ModBlockEntities.initialize();
 		ModScreenHandlers.initialize();
+		ModEntityTypes.initialize();
 		LOGGER.info("Hello Fabric world!");
+
+		FabricDefaultAttributeRegistry.register(ModEntityTypes.MARKET_VILLAGER,
+				MarketVillagerEntity.createMobAttributes());
 	}
 }
