@@ -8,13 +8,14 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import static com.avandortools.simplemarket.SimpleMarket.LOGGER;
 
-public class MarketVillagerEntity extends VillagerEntity {
+public class MarketWolfEntity extends VillagerEntity {
 
     private BlockPos ownerMarketBlock;
 
-    public MarketVillagerEntity(EntityType<? extends VillagerEntity> type, World world) {
+    public MarketWolfEntity(EntityType<? extends VillagerEntity> type, World world) {
         super(type, world);
     }
 

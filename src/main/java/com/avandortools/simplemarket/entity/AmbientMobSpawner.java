@@ -56,7 +56,7 @@ public class AmbientMobSpawner {
         );
 
         if (type == ModEntityTypes.MARKET_VILLAGER){
-            ((MarketVillagerEntity) mob).setOwnerMarketBlock(pos);
+            ((ModEntityTypes.MarketVillagerEntity) mob).setOwnerMarketBlock(pos);
         }
         world.spawnEntity(mob);
     }
