@@ -21,19 +21,16 @@ import java.util.function.Predicate;
  * Responsible for spawning and despawning market entities based on the time of day and current nearbyt entities
  */
 public class AmbientMobSpawner {
-    static final int spawnRadius = 16;
-    public static void tick(World world, BlockPos pos, ArrayList<MobEntity> villagers, int ambientSpawnTimer){
-        if (ambientSpawnTimer <= 0) {
-            if (AvandorTimeUtils.worldIsNight(world)) {
-                tryDespawnVillager(villagers);
-            } else {
-                final int crateCount = countNearbyMarketCrates(world, pos);
-                trySpawnAmbientMob(world, pos, EntityType.CAT, spawnRadius, 2, 1, villagers);
-                trySpawnAmbientMob(world, pos, EntityType.WOLF, spawnRadius, 1, 1, villagers);
-                MobEntity newVillager = trySpawnAmbientMob(world, pos, EntityType.VILLAGER, spawnRadius, (int) Math.ceil(0.5*crateCount), 1, villagers);
-                if (newVillager != null) villagers.add(newVillager);
-            }
-
+    static final int spawnRadius = 32;
+    public static void tick(World world, BlockPos pos, ArrayList<MobEntity> villagers){
+        if (AvandorTimeUtils.worldIsNight(world)) {
+            tryDespawnVillager(world, villagers, 10);
+        } else {
+            final int crateCount = countNearbyMarketCrates(world, pos);
+            trySpawnAmbientMob(world, pos, EntityType.CAT, spawnRadius, 2, 100, villagers);
+            trySpawnAmbientMob(world, pos, EntityType.WOLF, spawnRadius, 2, 1000, villagers);
+            MobEntity newVillager = trySpawnAmbientMob(world, pos, EntityType.VILLAGER, spawnRadius, (int) Math.ceil(0.5*crateCount), 1, villagers);
+            if (newVillager != null) villagers.add(newVillager);
         }
     }
 
@@ -117,9 +114,11 @@ public class AmbientMobSpawner {
                 .count();
     }
 
-    private static void tryDespawnVillager(ArrayList<MobEntity> villagers) {
-        if (!villagers.isEmpty()) {
-            villagers.removeFirst().discard();
+    private static void tryDespawnVillager(World world, ArrayList<MobEntity> villagers, int chanceOutOf) {
+        if (world.getRandom().nextInt(chanceOutOf) == 0) {
+            if (!villagers.isEmpty()) {
+                villagers.removeFirst().discard();
+            }
         }
     }
 }

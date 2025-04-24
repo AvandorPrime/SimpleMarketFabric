@@ -27,16 +27,26 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
-//    private final List<UUID> villagerUUIDs = new ArrayList<>();
     private final ArrayList<MobEntity> villagers = new ArrayList<>();
     private int ambientSpawnTimer = 200;
     //private int ambientSpawnStartValue = TimeConstants.TICKS_PER_IRL_MINUTE*5 + world.random.nextInt(TimeConstants.TICKS_PER_IRL_MINUTE*10);
     private final int ambientSpawnStartValue = 200;
+
+    private int currentProcessingProgress = 0;
+    private int currentAmbientSpawnProgress = 0;
+    private static final int MAX_AMBIENT_SPAWN_PROGRESS_BASE = TimeConstants.TICKS_PER_IRL_MINUTE*3;
+    private static final int MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE = TimeConstants.TICKS_PER_IRL_SECOND*30;
+    private int currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE; //hopefully randomized on block placement
+    private static final int MAX_PROCESSING_PROGRESS = TimeConstants.TICKS_PER_IRL_MINUTE*5; // How many ticks to fully process
+    private boolean isProcessing = false;
+
+    // Debug fast processing
+    //    private static final int MAX_PROGRESS = TimeConstants.TICKS_PER_IRL_SECOND*5; // Debug fast processing
+    //    private static final int MAX_AMBIENT_SPAWN_PROGRESS = TimeConstants.TICKS_PER_IRL_SECOND*3;
 
     public MarketCrateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MARKET_CRATE_BLOCK_ENTITY, pos, state);
@@ -77,7 +87,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         Inventories.readNbt(nbt, this.inventory, registryLookup);
         isProcessing = nbt.getBoolean("IsProcessing");
 
-        ambientSpawnTimer = nbt.getInt("AmbientSpawnTimer");
+        currentAmbientSpawnProgress = nbt.getInt("AmbientSpawnTimer");
         this.villagers.clear();
         NbtList list = nbt.getList("villagerUUIDs", NbtElement.STRING_TYPE);
 
@@ -96,7 +106,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         Inventories.writeNbt(nbt, this.inventory, registryLookup);
         nbt.putBoolean("IsProcessing", isProcessing);
 
-        nbt.putInt("AmbientSpawnTimer", ambientSpawnTimer);
+        nbt.putInt("AmbientSpawnTimer", currentAmbientSpawnProgress);
         NbtList list = new NbtList();
         for (MobEntity villager : villagers) {
             list.add(NbtHelper.fromUuid(villager.getUuid()));
@@ -127,46 +137,44 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         return BlockEntityUpdateS2CPacket.create(this);  // Create a packet to send block entity data to the client
     }
 
-    //this is where we sell items for coins $$$$ #capitalism #money #cringemod
-    public void processItems() {
-        ItemStack inputItem = inventory.get(0); // Slot 0 (input)
-        if (!inputItem.isEmpty()) {
-            // Move item from Slot 0 to Slot 1 (output)
-            inventory.set(1, inputItem.copy());
-            inventory.set(0, ItemStack.EMPTY); // Empty Slot 0
-            markDirty(); // Mark for saving
+    public void tick() {
+        if (this.world.isClient) return;
+        doItemProcessingTick();
+        doAmbientMobProcessingTick();
+    }
+
+    private void doAmbientMobProcessingTick() {
+        if(isProcessing) {
+            //tick ambient mob spawns
+            if (++currentAmbientSpawnProgress >= currentAmbientSpawnMax) {
+                System.out.println("ambientSpawnTimer Reached: " + currentAmbientSpawnProgress + "/" + currentAmbientSpawnMax);
+                AmbientMobSpawner.tick(this.world, this.pos, villagers);
+                currentAmbientSpawnProgress = 0;
+                setNewRandomMaxAmbientSpawnProgress();
+            }
         }
     }
 
-    private int progress = 0;
-//    private static final int MAX_PROGRESS = 5000; // How many ticks to fully process
-    private static final int MAX_PROGRESS = 100; // How many ticks to fully process
-    private boolean isProcessing = false;
-    public void tick() {
-        if (!this.world.isClient) {
-            ItemStack input = inventory.get(0);
-            ItemStack output = inventory.get(1);
+    private void doItemProcessingTick() {
+        ItemStack input = inventory.get(0);
+        ItemStack output = inventory.get(1);
 
-            if (!input.isEmpty() && output.isEmpty()) {
-                setIsProcessing(true);
-                progress++;
-                if (progress >= MAX_PROGRESS) {
-                    // Move item from slot 0 to 1
-                    inventory.set(1, input.split(1));
-                    if (input.isEmpty()) {
-                        inventory.set(0, ItemStack.EMPTY);
-                    }
-                    progress = 0;
-                    markDirty();
+        if (!input.isEmpty() && output.isEmpty()) {
+            setIsProcessing(true);
+            currentProcessingProgress++;
+            if (currentProcessingProgress >= MAX_PROCESSING_PROGRESS) {
+                // Move item from slot 0 to 1
+                inventory.set(1, input.split(1));
+                if (input.isEmpty()) {
+                    inventory.set(0, ItemStack.EMPTY);
                 }
-            } else {
-                // Reset if conditions aren't met
-                progress = 0;
-                setIsProcessing(false);
+                currentProcessingProgress = 0;
+                markDirty();
             }
-            AmbientMobSpawner.tick(this.world, this.pos, villagers, --ambientSpawnTimer);
-            System.out.println("ambientSpawnTimer: " + ambientSpawnTimer);
-            if (ambientSpawnTimer <= 0) ambientSpawnTimer = 200;
+        } else {
+            // Reset if conditions aren't met
+            currentProcessingProgress = 0;
+            setIsProcessing(false);
         }
     }
 
@@ -174,12 +182,12 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         return new PropertyDelegate() {
             @Override
             public int get(int index) {
-                return index == 0 ? progress : MAX_PROGRESS;
+                return index == 0 ? currentProcessingProgress : MAX_PROCESSING_PROGRESS;
             }
 
             @Override
             public void set(int index, int value) {
-                if (index == 0) progress = value;
+                if (index == 0) currentProcessingProgress = value;
             }
 
             @Override
@@ -208,6 +216,10 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
 
     public void onBlockDestroyed() {
         AmbientMobSpawner.destroyAllVillagers(villagers);
-        villagers.clear();
+    }
+
+    public void setNewRandomMaxAmbientSpawnProgress() {
+        currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE + world.random.nextBetween(-MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE, MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE);
+        markDirty();
     }
 }
