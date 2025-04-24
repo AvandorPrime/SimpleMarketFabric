@@ -1,6 +1,6 @@
 package com.avandortools.simplemarket.rendering.entity;
 
-import com.avandortools.simplemarket.entity.ModEntityTypes.MarketVillagerEntity;
+import com.avandortools.simplemarket.entity.MarketVillagerEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRendererFactory;

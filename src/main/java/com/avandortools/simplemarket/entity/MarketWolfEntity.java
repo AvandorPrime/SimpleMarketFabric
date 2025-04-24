@@ -5,17 +5,18 @@ import com.avandortools.simplemarket.util.AvandorTimeUtils;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import static com.avandortools.simplemarket.SimpleMarket.LOGGER;
 
-public class MarketWolfEntity extends VillagerEntity {
+public class MarketWolfEntity extends WolfEntity {
 
     private BlockPos ownerMarketBlock;
 
-    public MarketWolfEntity(EntityType<? extends VillagerEntity> type, World world) {
+    public MarketWolfEntity(EntityType<? extends WolfEntity> type, World world) {
         super(type, world);
     }
 
@@ -45,7 +46,7 @@ public class MarketWolfEntity extends VillagerEntity {
 
     @Override
     public void initGoals() {
-//        super.initGoals();
+        super.initGoals();
         if (ownerMarketBlock == null){
             LOGGER.info("skipping adding goal,,,");
             return;

@@ -3,29 +3,11 @@ package com.avandortools.simplemarket.entity;
 import com.avandortools.simplemarket.SimpleMarket;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 public class ModEntityTypes {
-
-    public static class MarketVillagerEntity extends MarketMobEntity {
-        public MarketVillagerEntity(EntityType<? extends MarketMobEntity> type, World world) {
-            super(type, world);
-        }
-    }
-    public static class MarketCatEntity extends MarketMobEntity {
-        public MarketCatEntity(EntityType<? extends MarketMobEntity> type, World world) {
-            super(type, world);
-        }
-    }
-    public static class MarketWolfEntity extends MarketMobEntity {
-        public MarketWolfEntity(EntityType<? extends MarketMobEntity> type, World world) {
-            super(type, world);
-        }
-    }
 
     public static void initialize() { }
 

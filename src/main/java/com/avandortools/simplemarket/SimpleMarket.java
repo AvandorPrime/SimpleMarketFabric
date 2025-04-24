@@ -4,7 +4,7 @@ import com.avandortools.simplemarket.block.ModBlocks;
 import com.avandortools.simplemarket.block.entity.ModBlockEntities;
 import com.avandortools.simplemarket.entity.MarketCatEntity;
 import com.avandortools.simplemarket.entity.MarketWolfEntity;
-import com.avandortools.simplemarket.entity.ModEntityTypes.MarketVillagerEntity;
+import com.avandortools.simplemarket.entity.MarketVillagerEntity;
 import com.avandortools.simplemarket.entity.ModEntityTypes;
 import com.avandortools.simplemarket.item.ModItems;
 import com.avandortools.simplemarket.screen.ModScreenHandlers;

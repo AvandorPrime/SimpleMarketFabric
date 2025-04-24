@@ -23,8 +23,8 @@ public class AmbientMobSpawner {
     public static void tick(World world, BlockPos pos){
         if (!AvandorTimeUtils.worldIsNight(world)) {
             final int crateCount = countNearbyMarketCrates(world, pos);
-            trySpawnAmbientMob(world, pos, EntityType.CAT, 2, 1);
-            trySpawnAmbientMob(world, pos, EntityType.WOLF, 2, 1000);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_CAT, 2, 1);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_WOLF, 2, 1);
             trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_VILLAGER, (int) Math.ceil(0.5*crateCount), 1);
         }
     }
@@ -56,7 +56,11 @@ public class AmbientMobSpawner {
         );
 
         if (type == ModEntityTypes.MARKET_VILLAGER){
-            ((ModEntityTypes.MarketVillagerEntity) mob).setOwnerMarketBlock(pos);
+            ((MarketVillagerEntity) mob).setOwnerMarketBlock(pos);
+        } else if (type == ModEntityTypes.MARKET_CAT) {
+            ((MarketCatEntity) mob).setOwnerMarketBlock(pos);
+        } else if (type == ModEntityTypes.MARKET_WOLF) {
+            ((MarketWolfEntity) mob).setOwnerMarketBlock(pos);
         }
         world.spawnEntity(mob);
     }
