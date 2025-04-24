@@ -30,7 +30,7 @@ public class SimpleMarket implements ModInitializer {
 		ModBlockEntities.initialize();
 		ModScreenHandlers.initialize();
 		ModEntityTypes.initialize();
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("Hello From SimpleMarket!");
 
 		FabricDefaultAttributeRegistry.register(ModEntityTypes.MARKET_VILLAGER,
 				MarketVillagerEntity.createMobAttributes());

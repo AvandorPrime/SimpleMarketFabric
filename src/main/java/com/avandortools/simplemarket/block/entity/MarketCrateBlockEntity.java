@@ -2,7 +2,6 @@ package com.avandortools.simplemarket.block.entity;
 
 import com.avandortools.simplemarket.block.MarketCrateBlock;
 import com.avandortools.simplemarket.entity.AmbientMobSpawner;
-import com.avandortools.simplemarket.entity.AmbientMobSpawner.AmbientMobGroup;
 import com.avandortools.simplemarket.screen.MarketCrateScreenHandler;
 import com.avandortools.simplemarket.util.AvandorTimeUtils.TimeConstants;
 import com.avandortools.simplemarket.util.ImplementedInventory;
@@ -25,13 +24,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Collections;
+
 public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
-    private final AmbientMobGroup spawnedAmbientMobs = new AmbientMobGroup();
 
     private int currentProcessingProgress = 0;
     private int currentAmbientSpawnProgress = 0;
 //    private static final int MAX_AMBIENT_SPAWN_PROGRESS_BASE = TimeConstants.TICKS_PER_IRL_MINUTE*3;
+
 //    private static final int MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE = TimeConstants.TICKS_PER_IRL_SECOND*30;
     private int currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE; //hopefully randomized on block placement
     private static final int MAX_PROCESSING_PROGRESS = TimeConstants.TICKS_PER_IRL_MINUTE*5; // How many ticks to fully process
@@ -40,7 +41,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     // Debug fast processing
     //    private static final int MAX_PROGRESS = TimeConstants.TICKS_PER_IRL_SECOND*5; // Debug fast processing
     private static final int MAX_AMBIENT_SPAWN_PROGRESS_BASE = TimeConstants.TICKS_PER_IRL_SECOND*3;
-    private static final int MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE = TimeConstants.TICKS_PER_IRL_SECOND*1;
+    private static final int MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE = TimeConstants.TICKS_PER_IRL_SECOND;
 
     public MarketCrateBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MARKET_CRATE_BLOCK_ENTITY, pos, state);
@@ -73,15 +74,12 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         super.readNbt(nbt, registryLookup);
 
         // Clear the current inventory to avoid leftover client data
-        for (int i = 0; i < inventory.size(); ++i) {
-            inventory.set(i, ItemStack.EMPTY);
-        }
+        Collections.fill(inventory, ItemStack.EMPTY);
 
         Inventories.readNbt(nbt, this.inventory, registryLookup);
         isProcessing = nbt.getBoolean("IsProcessing");
         currentAmbientSpawnProgress = nbt.getInt("AmbientSpawnTimer");
-        spawnedAmbientMobs.readAllToNBT(nbt, world, pos);
-        System.out.println("Read NBT: " + nbt);
+//        System.out.println("Read NBT: " + nbt);
     }
 
     @Override
@@ -90,8 +88,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
         Inventories.writeNbt(nbt, this.inventory, registryLookup);
         nbt.putBoolean("IsProcessing", isProcessing);
         nbt.putInt("AmbientSpawnTimer", currentAmbientSpawnProgress);
-        spawnedAmbientMobs.writeAllToNBT(nbt, world);
-        System.out.println("wrote NBT: " + nbt);
+//        System.out.println("wrote NBT: " + nbt);
     }
 
     @Override
@@ -118,7 +115,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     }
 
     public void tick() {
-        if (this.world.isClient) return;
+        if (this.getWorld() == null || this.getWorld().isClient) return;
         doItemProcessingTick();
         doAmbientMobProcessingTick();
     }
@@ -128,7 +125,7 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
             //tick ambient mob spawns
             if (++currentAmbientSpawnProgress >= currentAmbientSpawnMax) {
 //                System.out.println("ambientSpawnTimer Reached: " + currentAmbientSpawnProgress + "/" + currentAmbientSpawnMax);
-                AmbientMobSpawner.tick(this.world, this.pos, spawnedAmbientMobs);
+                AmbientMobSpawner.tick(this.world, this.pos);
                 currentAmbientSpawnProgress = 0;
                 setNewRandomMaxAmbientSpawnProgress();
             }
@@ -195,11 +192,15 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
     }
 
     public void onBlockDestroyed() {
-        AmbientMobSpawner.destroyAll(spawnedAmbientMobs);
+//        AmbientMobSpawner.destroyAll(spawnedAmbientMobs);
     }
 
     public void setNewRandomMaxAmbientSpawnProgress() {
-        currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE + world.random.nextBetween(-MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE, MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE);
+        if (this.getWorld() == null) {
+            currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE;
+            return;
+        }
+        currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE + this.getWorld().random.nextBetween(-MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE, MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE);
         markDirty();
     }
 }
