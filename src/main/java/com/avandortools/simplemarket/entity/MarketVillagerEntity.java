@@ -9,10 +9,13 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.Brain;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import static com.avandortools.simplemarket.SimpleMarket.LOGGER;
 
 public class MarketVillagerEntity extends VillagerEntity {
@@ -50,12 +53,17 @@ public class MarketVillagerEntity extends VillagerEntity {
     }
 
     @Override
+    protected SoundEvent getAmbientSound() {
+        return null; // This prevents the "hurmm" sound from being played.
+    }
+
+    @Override
     public void initGoals() {
         if (ownerMarketBlock == null){
             return;
         }
         this.goalSelector.add(0, new StayNearMarketGoal(this, ownerMarketBlock, MAX_DIST_FROM_MARKET, 0.25));
-        this.goalSelector.add(1, new BrowseMarketGoal(this, 0.8, MAX_DIST_FROM_MARKET, ownerMarketBlock, 100));
+        this.goalSelector.add(1, new BrowseMarketGoal(this, 0.25, MAX_DIST_FROM_MARKET, ownerMarketBlock, 100));
         this.goalSelector.add(2, new WanderWithinRadiusGoal(this, ownerMarketBlock, 0.25, MAX_DIST_FROM_MARKET));
         LOGGER.info("goals initialized");
     }
@@ -98,5 +106,10 @@ public class MarketVillagerEntity extends VillagerEntity {
     protected Brain.Profile<VillagerEntity> createBrainProfile() {
         // Return an empty profile so no tasks are loaded
         return Brain.createProfile(ImmutableList.of(), ImmutableList.of());
+    }
+
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        // do nothing - the super method expects us to have a brain and that causes exceptions when this entity dies.
     }
 }

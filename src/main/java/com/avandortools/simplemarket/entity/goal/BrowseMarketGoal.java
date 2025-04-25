@@ -2,9 +2,7 @@ package com.avandortools.simplemarket.entity.goal;
 
 import com.avandortools.simplemarket.block.MarketCrateBlock;
 import com.avandortools.simplemarket.entity.MarketVillagerEntity;
-import com.avandortools.simplemarket.util.AvandorTimeUtils;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
@@ -88,14 +86,14 @@ public class BrowseMarketGoal extends Goal {
     public void tick() {
         switch (state) {
             case WALKING_TO_CRATE:
-            if (mob.squaredDistanceTo(Vec3d.ofCenter(targetPos)) < 2.0) {
-                mob.getNavigation().stop();
-                mob.getLookControl().lookAt(Vec3d.ofCenter(targetPos));
-                state = BrowseState.DECIDING;
-                decidingTicks = 20 + mob.getRandom().nextInt(10);
-                mob.playSound(SoundEvents.ENTITY_VILLAGER_AMBIENT, 1.0F, 1.0F);
-            }
-            break;
+                if (mob.squaredDistanceTo(Vec3d.ofCenter(targetPos)) < 2.0) {
+                    mob.getNavigation().stop();
+                    mob.getLookControl().lookAt(Vec3d.ofCenter(targetPos));
+                    state = BrowseState.DECIDING;
+                    decidingTicks = 20 + mob.getRandom().nextInt(10);
+                    mob.playSound(SoundEvents.ENTITY_VILLAGER_AMBIENT, 1.0F, 1.0F);
+                }
+                break;
             case DECIDING:
                 if (--decidingTicks <= 0) {
                     state = BrowseState.EATING;
@@ -105,16 +103,18 @@ public class BrowseMarketGoal extends Goal {
                 break;
             case EATING:
                 mob.setHeadRollingTimeLeft(40);
-                mob.playSound(SoundEvents.ENTITY_GENERIC_EAT, 1.0F, 1.0F); //playing the sound and spawning particles happen every tick. do we want to reduce this freqency to a once off or every n ticks?
-                ((ServerWorld) mob.getWorld()).spawnParticles(
-                        new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(Items.BREAD)),
-                        mob.getX(), mob.getY() + 1.0, mob.getZ(),
-                        5, 0.2, 0.2, 0.2, 0.05
-                );
+                if (eatingTicks % 2 == 0) {
+                    mob.playSound(SoundEvents.ENTITY_GENERIC_EAT, 1.0F, 1.0F);
+                    ((ServerWorld) mob.getWorld()).spawnParticles(
+                            new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(Items.BREAD)),
+                            mob.getX(), mob.getY() + 1.0, mob.getZ(),
+                            5, 0.2, 0.2, 0.2, 0.05
+                    );
+                }
                 if (--eatingTicks <= 0) {
                     mob.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                     state = BrowseState.SPINNING;
-                    spinTicks = 48;
+                    spinTicks = 24;
                 }
                 break;
             case SPINNING:
