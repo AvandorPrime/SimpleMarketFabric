@@ -5,8 +5,11 @@ Initially this will only work with food items, but can potentially be expanded.
 ![Screenshot 2025-04-23 001203.png](Screenshot%202025-04-23%20001203.png)
 
 ## prebeta TODO
-- nitwit/friendly mob spawn on completion, slight chance
-- despawn villagers slowly at night
+~~- nitwit/friendly mob spawn on completion, slight chance
+- despawn villagers slowly at night~~
+- change tick method to force moving towards goal (villagers have a "brain" or something)
+- extract similar entity methods
+- custom sprites for new mobs
 - zero out progress when item input is swapped
 - villagers will eat food
 - Restrict market crate to only take food items

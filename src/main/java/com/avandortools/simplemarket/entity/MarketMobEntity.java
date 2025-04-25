@@ -1,6 +1,7 @@
 package com.avandortools.simplemarket.entity;
 
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
+import com.avandortools.simplemarket.entity.goal.StayNearMarketGoal;
 import com.avandortools.simplemarket.util.AvandorTimeUtils;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.EntityType;
@@ -74,7 +75,7 @@ public abstract class MarketMobEntity extends MobEntity {
         if (ownerMarketBlock == null) {
             LOGGER.info("skipping adding goal,,,");
         }
-        this.goalSelector.add(0, new AmbientMobSpawner.StayNearBlockGoal(this, ownerMarketBlock, 4, 0.25));
+        this.goalSelector.add(0, new StayNearMarketGoal(this, ownerMarketBlock, 4, 0.25));
         LOGGER.info("goal initialized");
     }
 }

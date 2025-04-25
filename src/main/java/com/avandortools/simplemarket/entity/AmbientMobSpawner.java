@@ -3,7 +3,9 @@ package com.avandortools.simplemarket.entity;
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
 import com.avandortools.simplemarket.util.AvandorTimeUtils;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -23,9 +25,9 @@ public class AmbientMobSpawner {
     public static void tick(World world, BlockPos pos){
         if (!AvandorTimeUtils.worldIsNight(world)) {
             final int crateCount = countNearbyMarketCrates(world, pos);
-            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_CAT, 2, 1);
-            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_WOLF, 2, 1);
-            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_VILLAGER, (int) Math.ceil(0.5*crateCount), 1);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_CAT, 1, 1000);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_WOLF, 1, 1000);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_VILLAGER, (int) Math.ceil(1*crateCount), 1);
         }
     }
 
@@ -63,37 +65,6 @@ public class AmbientMobSpawner {
             ((MarketWolfEntity) mob).setOwnerMarketBlock(pos);
         }
         world.spawnEntity(mob);
-    }
-
-    public static class StayNearBlockGoal extends net.minecraft.entity.ai.goal.Goal {
-        private final MobEntity mob;
-        private final BlockPos anchor;
-        private final double maxDistance;
-        private final double speed;
-
-        public StayNearBlockGoal(MobEntity mob, BlockPos anchor, double maxDistance, double speed) {
-            this.mob = mob;
-            this.anchor = anchor;
-            this.maxDistance = maxDistance;
-            this.speed = speed;
-        }
-
-        @Override
-        public boolean canStart() {
-            if (anchor == null) return false;
-            return mob.squaredDistanceTo(Vec3d.ofCenter(anchor)) > maxDistance * maxDistance;
-        }
-
-        @Override
-        public void start() {
-            LOGGER.info("job start :{}", anchor);
-            mob.getNavigation().startMovingTo(anchor.getX() + 0.5, anchor.getY(), anchor.getZ() + 0.5, speed);
-        }
-
-        @Override
-        public boolean shouldContinue() {
-            return canStart();
-        }
     }
 
     private static int countNearbyMarketCrates(World world, BlockPos pos) {
