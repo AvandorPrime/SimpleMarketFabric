@@ -3,19 +3,14 @@ package com.avandortools.simplemarket.entity;
 import com.avandortools.simplemarket.block.entity.MarketCrateBlockEntity;
 import com.avandortools.simplemarket.util.AvandorTimeUtils;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.function.Predicate;
-
-import static com.avandortools.simplemarket.SimpleMarket.LOGGER;
 
 /**
  * Responsible for spawning and despawning market entities based on the time of day and current nearbyt entities
@@ -25,8 +20,8 @@ public class AmbientMobSpawner {
     public static void tick(World world, BlockPos pos){
         if (!AvandorTimeUtils.worldIsNight(world)) {
             final int crateCount = countNearbyMarketCrates(world, pos);
-            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_CAT, 1, 1000);
-            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_WOLF, 1, 1000);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_CAT, 1, 1);
+            trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_WOLF, 1, 1);
             trySpawnAmbientMob(world, pos, ModEntityTypes.MARKET_VILLAGER, (int) Math.ceil(1*crateCount), 1);
         }
     }
