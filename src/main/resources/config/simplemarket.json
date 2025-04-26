@@ -1,5 +1,6 @@
 {
   "processing_time_ticks": 200,
+  "villager_market_cooldown_ticks": 60,
   "food_coin_values": {
     "minecraft:bread": 1,
     "minecraft:cooked_porkchop": 5,

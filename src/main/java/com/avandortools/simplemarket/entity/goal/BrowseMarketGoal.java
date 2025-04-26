@@ -2,6 +2,7 @@ package com.avandortools.simplemarket.entity.goal;
 
 import com.avandortools.simplemarket.block.MarketCrateBlock;
 import com.avandortools.simplemarket.entity.MarketVillagerEntity;
+import com.avandortools.simplemarket.util.SimpleMarketConfig;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -18,7 +19,6 @@ import java.util.EnumSet;
 public class BrowseMarketGoal extends Goal {
     private final MarketVillagerEntity mob;
     private final double speed;
-    private final int cooldownLimit;
     private final int radius;
     private BlockPos targetPos;
     private final BlockPos anchorPos;
@@ -27,13 +27,14 @@ public class BrowseMarketGoal extends Goal {
     private int spinTicks = 0;
     private int decidingTicks = 0;
     private BrowseState state = BrowseState.WALKING_TO_CRATE;
+    private final int cooldownLimit = SimpleMarketConfig.getInstance().getInt("villager_market_cooldown_ticks");
 
-    public BrowseMarketGoal(MarketVillagerEntity mob, double speed, int radius, BlockPos anchorPos, int cooldownTicks) {
+
+    public BrowseMarketGoal(MarketVillagerEntity mob, double speed, int radius, BlockPos anchorPos) {
         this.mob = mob;
         this.speed = speed;
         this.radius = radius;
-        this.cooldownLimit = cooldownTicks;
-        this.cooldownTicks = cooldownTicks;
+        this.cooldownTicks = cooldownLimit;
         this.anchorPos = anchorPos;
     }
 
@@ -46,13 +47,14 @@ public class BrowseMarketGoal extends Goal {
 
     @Override
     public boolean canStart() {
+//        System.out.println(String.format("cooldown ticks %d/%d", cooldownTicks, cooldownLimit));
         if (cooldownTicks > 0) {
             cooldownTicks--;
             return false;
         }
 
-        if (mob.getNavigation().isFollowingPath() || mob.getRandom().nextInt(100) < 90)
-            return false; // Small random chance to start browsing
+//        if (mob.getRandom().nextInt(100) < 90)
+//            return false; // Small random chance to start browsing
 
         targetPos = findNearbyCrate();
         return targetPos != null;

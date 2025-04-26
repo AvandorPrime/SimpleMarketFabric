@@ -63,7 +63,7 @@ public class MarketVillagerEntity extends VillagerEntity {
             return;
         }
         this.goalSelector.add(0, new StayNearMarketGoal(this, ownerMarketBlock, MAX_DIST_FROM_MARKET, 0.25));
-        this.goalSelector.add(1, new BrowseMarketGoal(this, 0.25, MAX_DIST_FROM_MARKET, ownerMarketBlock, 100));
+        this.goalSelector.add(1, new BrowseMarketGoal(this, 0.25, MAX_DIST_FROM_MARKET, ownerMarketBlock));
         this.goalSelector.add(2, new WanderWithinRadiusGoal(this, ownerMarketBlock, 0.25, MAX_DIST_FROM_MARKET));
         LOGGER.info("goals initialized");
     }
