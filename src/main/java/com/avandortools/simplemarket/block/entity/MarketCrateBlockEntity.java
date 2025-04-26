@@ -23,6 +23,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import com.avandortools.simplemarket.util.SimpleMarketConfig;
 
 import java.util.Collections;
 
@@ -35,8 +36,9 @@ public class MarketCrateBlockEntity extends BlockEntity implements NamedScreenHa
 
 //    private static final int MAX_AMBIENT_SPAWN_PROGRESS_VARIANCE = TimeConstants.TICKS_PER_IRL_SECOND*30;
     private int currentAmbientSpawnMax = MAX_AMBIENT_SPAWN_PROGRESS_BASE; //hopefully randomized on block placement
-    private static final int MAX_PROCESSING_PROGRESS = TimeConstants.TICKS_PER_IRL_MINUTE*5; // How many ticks to fully process
+//    private static final int MAX_PROCESSING_PROGRESS = TimeConstants.TICKS_PER_IRL_MINUTE*5; // How many ticks to fully process
     private boolean isProcessing = false;
+    private static final int MAX_PROCESSING_PROGRESS = SimpleMarketConfig.getInstance().getInt("processing_time_ticks");
 
     // Debug fast processing
     //    private static final int MAX_PROGRESS = TimeConstants.TICKS_PER_IRL_SECOND*5; // Debug fast processing
